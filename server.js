@@ -4,7 +4,6 @@ const port = 3000;
 const translate = express.Router();
 
 const deepl = require('deepl');
-const deeplRita = require('rita-deepl-translate-api');
 require('dotenv').config();
 
 server.use('/translate', translate);
@@ -13,11 +12,11 @@ server.disable('x-powered-by');
 /**
  * Call to Deepl service to translate a given text in a given language.
  */
-translate.get('/deepl/:text/:source_lang/:target_lang', (req, res) => {
+translate.get('/deepl/:source_lang/:target_lang/:text', (req, res) => {
     // Request params
-    const textToTranslate = req.params.text;
     const sourceLang = req.params.source_lang.toLowerCase();
     const targetLang = req.params.target_lang.toLowerCase();
+    const textToTranslate = req.params.text;
 
     if (textToTranslate.trim().length === 0) {
         res.status(500).json({ error: '[Error] The term must have at least one character' });
@@ -34,7 +33,11 @@ translate.get('/deepl/:text/:source_lang/:target_lang', (req, res) => {
     }
 
     const authKey = process.env.AUTHKEY;
-    console.log(`[DEBUG] Sended data:\n - Text: ${textToTranslate}\n - Source Lang: ${sourceLang}\n - Target lang: ${targetLang}\n - AuthKey: ${authKey}`);
+    if (!authKey) {
+        res.status(500).json({ error: '[ERROR] Auth key missing' });
+    }
+
+    console.debug(`[DEBUG] Sended data:\n - Text: ${textToTranslate}\n - Source Lang: ${sourceLang}\n - Target lang: ${targetLang}\n - AuthKey: ${authKey}`);
 
     // Call Deepl API service
     deepl({
