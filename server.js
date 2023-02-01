@@ -1,10 +1,10 @@
 const express = require('express');
+const deepl = require('deepl');
+require('dotenv').config();
+
 const server = express();
 const port = 3000;
 const translate = express.Router();
-
-const deepl = require('deepl');
-require('dotenv').config();
 
 server.use('/translate', translate);
 server.disable('x-powered-by');
@@ -29,7 +29,7 @@ translate.get('/deepl/:source_lang/:target_lang/:text', (req, res) => {
     // This array needs to be updated when the list of available languages in Bobcat changes.
     const langs = ['fr', 'en', 'it', 'es', 'pt', 'de', 'fi', 'da', 'nl', 'no', 'sv', 'ru'];
     if (!langs.includes(sourceLang) || !langs.includes(targetLang)) {
-        res.status(500).json({ error: '[Error] Use an available language among ' + langs.join(', ') });
+        res.status(500).json({ error: '[Error] Use an available language among: ' + langs.join(', ') });
     }
 
     const authKey = process.env.AUTHKEY;
